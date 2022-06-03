@@ -1,9 +1,10 @@
 from flask import Flask
+from flask import request, redirect
 
 app = Flask(__name__)
 
+nextId = 4
 #리스트, 딕셔너리를 활용하여 메모리를 사용하기 때문에 나중에 값 수정할 경우 날아감,,, 일반적으로 DB에서 다룸
-
 topics = [
     {'id': 1, 'title': 'html', 'body': 'html is ...'},
     {'id': 2, 'title': 'css', 'body': 'css is ...'},
@@ -19,6 +20,9 @@ def template(contents, content):
                 {contents}
             </ol>
             {content}
+            <ul>
+            <li><a href="/create/">create</a></li>
+            </ul>
         </body>
     </html>
     '''
@@ -45,8 +49,28 @@ def read(id):
                 break
         return template(getContents(), f'<h2>{title}</h2>{body}')
 
-@app.route('/create/')
+@app.route('/create/', methods=['GET', 'POST'])
 def create():
-    return 'Create'
+    print('request.method', request.method)
+    if request.method == 'GET':
+        content = '''
+            <form action="/create/" method="POST">
+                <p><input type="text" name="title" placeholder="title"></p>
+                <p><textarea name="body" placeholder="body"></textarea></p>
+                <p><input type="submit" value="create"></p>
+            </form>
+        '''
+        return template(getContents(), content)
+    elif request.method == 'POST':
+        global nextId
+        title = request.form['title']
+        body = request.form['body']
+        newTopic = {'id': nextId, 'title': title, 'body': body}
+        topics.append(newTopic)
+        url = '/read/'+str(nextId)+'/'
+        nextId = nextId + 1
+
+        return redirect(url)
+
 
 app.run(debug=True)
