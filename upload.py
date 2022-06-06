@@ -14,7 +14,7 @@ def upload_file():
         f = request.files['file']
         # 저장할 경로 + 파일명
         f.save(secure_filename(f.filename))
-        return 'uploads 디렉토리 -> 파일 업로드 성공!'
+        return '파일 업로드 성공!'
 
 if __name__ == '__main__':
     # 서버 실행
