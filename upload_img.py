@@ -1,11 +1,8 @@
 import os
-from flask import Flask, request
+from flask import Flask, request, flash, redirect
 from werkzeug.utils import secure_filename
 
-UPLOAD_DIR = "D:/"
-
 app = Flask(__name__)
-app.config['UPLOAD_DIR'] = UPLOAD_DIR
 
 @app.route('/')
 def upload_main():
@@ -29,8 +26,14 @@ def upload_main():
 def upload_files():
     if request.method == 'POST':
         f = request.files['file']
-        f.save(secure_filename(f.filename))
-        return 'File upload complete'
+        f.save('./uploaded_img/' + secure_filename(f.filename))
+
+        return """
+             <script>
+                alert("File upload complete");
+                window.location = '/';
+             </script>
+        """
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(debug=True)
