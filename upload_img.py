@@ -38,7 +38,7 @@ def upload_files():
         """
 
 @app.route('/list')
-def list_page():
+def img_list():
 	file_list = os.listdir("./uploaded_img")
 	html = """<center><a href="/">홈페이지</a><br><br>"""
 	html += "file_list: {}".format(file_list) + "</center>"
