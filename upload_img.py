@@ -18,7 +18,8 @@ def upload_main():
         <form action="http://localhost:5000/file-upload" method="POST" enctype="multipart/form-data">
             <input type="file" name="file">
             <input type="submit">
-            
+            <br><br><br>
+            <a href="./list">파일 목록</a>
         </form>
     </body>
     </html>"""
