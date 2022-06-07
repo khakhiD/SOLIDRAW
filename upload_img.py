@@ -20,6 +20,7 @@ def upload_main():
             <input type="submit">
             <br><br><br>
             <a href="./list">파일 목록</a>
+            <br><br><br>
         </form>
     </body>
     </html>"""
