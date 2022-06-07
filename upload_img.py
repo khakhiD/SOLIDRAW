@@ -19,7 +19,7 @@ def upload_main():
             <input type="file" name="file">
             <input type="submit">
             <br><br><br>
-            <a href="./list">파일 목록</a>
+            <a href="./list">이미지 확인</a>
         </form>
     </body>
     </html>"""
@@ -39,10 +39,16 @@ def upload_files():
 
 @app.route('/list')
 def img_list():
-	file_list = os.listdir("./uploaded_img")
-	html = """<center><a href="/">홈페이지</a><br><br>"""
-	html += "file_list: {}".format(file_list) + "</center>"
-	return html
+	return """
+	<!DOCTYPE html>
+    <html>
+    <body>
+    <a href="/">홈페이지</a>
+    <h2>업로드한 사진</h2>
+    <img src="C:/Users/dyson/Desktop/archive/python_work/SOLIDRAW/uploaded_img/test.png">
+    </body>
+    </html>
+	"""
 
 
 if __name__ == '__main__':
