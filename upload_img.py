@@ -18,6 +18,8 @@ def upload_main():
         <form action="http://localhost:5000/file-upload" method="POST" enctype="multipart/form-data">
             <input type="file" name="file">
             <input type="submit">
+            <br><br><br>
+            <a href="./list">파일 목록</a>
         </form>
     </body>
     </html>"""
@@ -34,6 +36,14 @@ def upload_files():
                 window.location = '/';
              </script>
         """
+
+@app.route('/list')
+def list_page():
+	file_list = os.listdir("./uploaded_img")
+	html = """<center><a href="/">홈페이지</a><br><br>"""
+	html += "file_list: {}".format(file_list) + "</center>"
+	return html
+
 
 if __name__ == '__main__':
     app.run(debug=True)
