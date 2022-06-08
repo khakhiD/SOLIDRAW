@@ -9,6 +9,7 @@ app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
 app.config['UPLOAD_EXTENSIONS'] = ['.jpg', '.png', '.gif']
 app.config['UPLOAD_PATH'] = 'static/img/'
 
+
 def validate_image(stream):
     header = stream.read(512)
     stream.seek(0)
@@ -38,9 +39,11 @@ def upload_files():
         uploaded_file.save(os.path.join(app.config['UPLOAD_PATH'], "before.jpg"))
     return '', 204
 
-@app.route('/uploads/<filename>')
-def upload(filename):
-    return send_from_directory(app.config['UPLOAD_PATH'], filename)
+@app.after_request
+def add_header(response):
+    response.headers['X-UA-Compatible'] = 'IE=Edge,chrome=1'
+    response.headers['Cache-Control'] = 'public, max-age=0'
+    return response
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(port=5000, debug=True)
