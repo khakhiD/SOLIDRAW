@@ -8,28 +8,44 @@
     <h1>이미지 등록하기</h1>
     <form action="{{ url_for('upload_files') }}" class="dropzone">
     </form>
+    <br>
+    <input type="button" id="button0" onclick="button0_click();" value="서버에서 사진 지우기" />
+    <br>
+    <script>
+    function button0_click(){
+      function FileDel(){
+        var myObject;
+        myObject = new ActiveXObject("Scripting.FileSystemObject");
+        myObject.DeleteFile("./static/img/before.png");
+      }
+      FileDel();
+     }
+    </script>
     <script src="./static/js/drop_img.js"></script>
     <br><br>
     <h2>등록된 사진</h2>
     <button onclick="page_update()">등록한 이미지 확인을 위해 클릭!</button>
     <script>
-    function page_update() {
-    location.reload(true);
-    }
-
-</script>
+      function page_update() {
+      location.reload(true);
+      }
+    </script>
     <p><img src="./static/img/before.png"/></p>
     <br><br>
     <input type="button" id="button1" onclick="button1_click('hello');" value="변환" />
-    <script>function button1_click(s) {
-    function display_image(src, alt) {
-    var a = document.createElement("img");
-    a.src = src;
-    a.alt = alt;
-    document.body.appendChild(a);
-    }
-    display_image('./static/img/after.png',
-                 '변환된 도면');}</script>
-    <br><br>
+    <br>
+    <script>
+      function button1_click(s) {
+      function display_image(src, alt) {
+      var a = document.createElement("img");
+      a.src = src;
+      a.alt = alt;
+      document.body.appendChild(a);
+      }
+      display_image('./static/img/after.png',
+                 '변환된 도면');}
+    </script>
+    <a href="./static/img/after.png" download><button>다운</button></a>
+
   </body>
 </html>
