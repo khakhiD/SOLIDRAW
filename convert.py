@@ -22,7 +22,7 @@ def kakao_ocr(image_path: str, appkey: str):
 
 
 def main():
-    image_path = 'before.png'
+    image_path = 'static/img/before.png'
     # 손그림 도면 이미지 로드
     image = cv2.imread(image_path)
     # 로드된 이미지와 같은 가로 세로 사이즈의 초기화 된 결과 이미지 생성
@@ -387,7 +387,7 @@ def main():
 
     cv2.imshow('sized_image', sized_image)
     cv2.waitKey(0)
-    cv2.imwrite('after.png', sized_image)
+    cv2.imwrite('static/img/after.png', sized_image)
     cv2.destroyAllWindows()
 
 
