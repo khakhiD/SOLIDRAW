@@ -11,6 +11,25 @@
     <script src="./static/js/drop_img.js"></script>
     <br><br>
     <h2>등록된 사진</h2>
-    <p><img src="./static/img/before.jpg"/></p>
+    <button onclick="page_update()">등록한 이미지 확인을 위해 클릭!</button>
+    <script>
+    function page_update() {
+    location.reload(true);
+    }
+
+</script>
+    <p><img src="./static/img/before.png"/></p>
+    <br><br>
+    <input type="button" id="button1" onclick="button1_click('hello');" value="변환" />
+    <script>function button1_click(s) {
+    function display_image(src, alt) {
+    var a = document.createElement("img");
+    a.src = src;
+    a.alt = alt;
+    document.body.appendChild(a);
+    }
+    display_image('./static/img/after.png',
+                 '변환된 도면');}</script>
+    <br><br>
   </body>
 </html>

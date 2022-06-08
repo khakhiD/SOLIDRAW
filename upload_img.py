@@ -1,7 +1,6 @@
 import imghdr
 import os
-from flask import Flask, render_template, request, redirect, url_for, abort, \
-    send_from_directory
+from flask import Flask, render_template, request
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -36,7 +35,7 @@ def upload_files():
         if file_ext not in app.config['UPLOAD_EXTENSIONS'] or \
                 file_ext != validate_image(uploaded_file.stream):
             return "Invalid image", 400
-        uploaded_file.save(os.path.join(app.config['UPLOAD_PATH'], "before.jpg"))
+        uploaded_file.save(os.path.join(app.config['UPLOAD_PATH'], "before.png"))
     return '', 204
 
 @app.after_request
