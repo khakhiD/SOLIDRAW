@@ -2,15 +2,15 @@
 <html>
   <head>
     <title>File Upload</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.1/min/dropzone.min.css">
+    <link rel="stylesheet" href="./static/css/dropzone.css">
   </head>
   <body>
     <h1>이미지 등록하기</h1>
     <form action="{{ url_for('upload_files') }}" class="dropzone">
     </form>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.1/min/dropzone.min.js"></script>
+    <script src="./static/js/drop_img.js"></script>
     <br><br>
     <h2>등록된 사진</h2>
-    <p><img src="./static/img/test.jpg"/></p>
+    <p><img src="./static/img/screen.png"/></p>
   </body>
 </html>
