@@ -35,7 +35,7 @@ def upload_files():
         if file_ext not in app.config['UPLOAD_EXTENSIONS'] or \
                 file_ext != validate_image(uploaded_file.stream):
             return "Invalid image", 400
-        uploaded_file.save(os.path.join(app.config['UPLOAD_PATH'], filename))
+        uploaded_file.save(os.path.join(app.config['UPLOAD_PATH'], "before.jpg"))
     return '', 204
 
 @app.route('/uploads/<filename>')
