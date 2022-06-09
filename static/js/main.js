@@ -1,45 +1,102 @@
 const spinner = document.getElementById('loading');
-function loadingSpin(){
+const dBtn = document.querySelector("downloadBtn")
+const convert_show = document.getElementById('convert-show');
+const convert_button = document.getElementById('button1');
+
+function loadingSpin(time){
     //로딩 표시
     showLoading();
     //로딩 숨기기
-    setTimeout("hideLoading()", 1500);
+    setTimeout("hideLoading()", time);
 }
 function showLoading(){
-    document.getElementById('loading').style.display = 'block';
-    document.body.style.opacity = '.95';
+    document.getElementById('loading').style.display = 'flex';
 }
 function hideLoading(){
     document.getElementById('loading').style.display = 'none';
-    document.body.style.opacity = '1';
 }
 
+function addDownloadBtn(){
+    let link = document.createElement("a");
+    link.setAttribute('href',"./static/img/after.png");
+    link.setAttribute('download', "download");
+
+    let downloadBtn = document.createElement("button");
+    downloadBtn.setAttribute("class","convert__button");
+    downloadBtn.textContent = '다운로드';
+    link.appendChild(downloadBtn);
+
+    convert_show.removeChild(convert_button);
+    convert_show.appendChild(link);
+}
+
+function borderStress(time){
+    console.log('borderStress start');
+    const image_border = document.getElementById('image-show');
+    image_border.style.border = "10px solid var(--first-color)";
+    let checkbox = document.createElement('i');
+    checkbox.setAttribute('class', "bx bxs-check-square");
+    checkbox.style.display = "flex";
+    checkbox.style.color = "var(--first-color)";
+    checkbox.style.position = "absolute";
+    checkbox.style.width = "100%";
+    checkbox.style.height = "100%";
+    checkbox.style.justifyContent="center";
+    checkbox.style.alignItems="center";
+    checkbox.style.textAlign = "center";
+    checkbox.style.fontSize = "7rem";
+    checkbox.style.transition = ".5s";
+    image_border.appendChild(checkbox);
+    setTimeout(()=>{
+        image_border.style.border = "3px solid var(--text-color-light)";
+        image_border.removeChild(checkbox);
+    }, time);
+}
 
 /*=============== SUBMIT BUTTON ==========================*/
 function loadFile(input) {
     let file = input.files[0];	//선택된 파일 가져오기
-    loadingSpin();
     //미리 만들어 놓은 div에 text(파일 이름) 추가
     let name = document.getElementById('fileName');
     name.textContent = file.name;
 
-  	//새로운 이미지 div 추가
-    let newImage = document.createElement("img");
-    newImage.setAttribute("class", 'img');
-
-    //이미지 source 가져오기
-    newImage.src = URL.createObjectURL(file);
-
-    newImage.style.width = "70%";
-    newImage.style.height = "70%";
-    newImage.style.visibility = "hidden";   //버튼을 누르기 전까지는 이미지를 숨긴다
-    newImage.style.objectFit = "contain";
-
-    //이미지를 image-show div에 추가
     let container = document.getElementById('image-show');
-    container.appendChild(newImage);
-    newImage = document.getElementById('image-show').lastElementChild;
-    newImage.style.visibility ="visible";
+    console.log(container.hasChildNodes());
+    if(container.childElementCount > 1) {
+        location.reload();
+    } else {
+        //새로운 이미지 div 추가
+        let newImage = document.createElement("img");
+        newImage.setAttribute("class", 'img');
+
+        //이미지 source 가져오기
+        newImage.src = URL.createObjectURL(file);
+        newImage.style.width = "100%";
+        newImage.style.height = "100%";
+        newImage.style.visibility = "hidden";   //버튼을 누르기 전까지는 이미지를 숨긴다
+        newImage.style.objectFit = "contain";
+
+        //이미지를 image-show div에 추가
+        container.style.backgroundColor = "var(--body-color)";
+        container.style.border = "3px solid var(--text-color-light)";
+        container.style.display = "flex";
+        container.style.marginBottom = "0.5rem";
+        container.style.padding = "0.35rem 0.35rem 0.35rem 0.35rem";
+        container.style.alignItems = "center";
+        container.style.justifyContent = "center";
+        container.style.borderRadius = "0.75rem";
+        container.hasChildNodes()
+        container.appendChild(newImage);
+        console.log(container.hasChildNodes());
+    }
+    image_show = document.getElementById('image-show').lastElementChild;
+    image_show.style.visibility ="visible";
+    const cvbtn = document.getElementById('convert-show');
+    cvbtn.style.visibility="visible";
+}
+
+function convertShow(){
+
 }
 
 /*=============== CHANGE BACKGROUND HEADER ===============*/
@@ -155,8 +212,8 @@ themeButton.addEventListener("click", () => {
 const sr = ScrollReveal({
   origin: "top",
   distance: "60px",
-  duration: 2500,
-  delay: 400,
+  duration: 2000,
+  delay: 350,
   // reset: true
 });
 

@@ -9,7 +9,7 @@ app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
 #input 데이터의 확장자 조건
 app.config['UPLOAD_EXTENSIONS'] = ['.jpg', '.png', '.gif']
 #이미지가 저장될 경로
-app.config['UPLOAD_PATH'] = 'solidraw/temp/'
+app.config['UPLOAD_PATH'] = './static/img/'
 
 
 def validate_image(stream):
@@ -63,4 +63,4 @@ def add_header(response):
     return response
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    app.run(port=5000)
