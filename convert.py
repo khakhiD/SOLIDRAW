@@ -22,16 +22,19 @@ def kakao_ocr(image_path: str, appkey: str):
 
 
 def main():
-    image_path = 'solidraw/static/img/before.png'
+    image_path = 'static/img/before.png'
     # 손그림 도면 이미지 로드
     image = cv2.imread(image_path)
-    # 로드된 이미지와 같은 가로 세로 사이즈의 초기화 된 결과 이미지 생성
+    # 로드된 이미지와 같은 가로 세로 사이즈의 초기화 된 직선 보정 이미지 저장
     correction_image = np.zeros_like(image)
+    # 로드된 이미지와 같은 가로 세로 사이즈의 초기화 된 결과 이미지 저장
+    result_image = np.zeros_like(image)
+    result_image = 255 - result_image
     # orig_image 변수에 원본 이미지 카피
     orig_image = image.copy()
     # 원본 이미지 출력
-    cv2.imshow('Original Image', orig_image)
-    cv2.waitKey(0)
+    # cv2.imshow('Original Image', orig_image)
+    # cv2.waitKey(0)
 
     # OCR 함수 호출
     rest_api_key = '40fdaecbbd83eb558d065bddeb63c7cd'
@@ -61,9 +64,9 @@ def main():
             for k in range(y1 - 1, y2 + 1):
                 image[k][j] = [255, 255, 255]
 
-    # 문자 제거
-    cv2.imshow('Remove Characters', image)
-    cv2.waitKey(0)
+    # 문자 제거 이미지 출력
+    # cv2.imshow('Remove Characters', image)
+    # cv2.waitKey(0)
 
     # 이미지 흑백 변환 및 이진화
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -75,8 +78,8 @@ def main():
     for c in contours:
         x, y, w, h = cv2.boundingRect(c)
         cv2.rectangle(image, (x, y), (x + w, y + h), (0, 0, 255), 2)
-        cv2.imshow('Shape Detection', image)
-    cv2.waitKey(0)
+        # cv2.imshow('Shape Detection', image)
+    # cv2.waitKey(0)
 
     # 도형 개수 카운트 변수
     cnt = 0
@@ -290,12 +293,10 @@ def main():
 
         # 결과 이미지에 도면 그리기
         cv2.drawContours(correction_image, [approx], 0, colors[cnt], 2)
-        cv2.imshow('Straight Line Correction', correction_image)
+        # cv2.imshow('Straight Line Correction', correction_image)
         # 도형 개수 카운트 증감
         cnt = cnt + 1
-    cv2.waitKey(0)
-    print(OCR_room)
-    print(rooms_points)
+    # cv2.waitKey(0)
 
     # 이미지 흑백 변환
     sized_image = 255 - (cv2.cvtColor(correction_image, cv2.COLOR_BGR2GRAY))
@@ -312,17 +313,24 @@ def main():
             text = ' ' + text
 
         if size_points[i][0][0] < upper_left[0]:
+            result_image = cv2.rotate(result_image, cv2.ROTATE_90_CLOCKWISE)  # 시계 방향으로 90도 회전
             sized_image = cv2.rotate(sized_image, cv2.ROTATE_90_CLOCKWISE)  # 시계 방향으로 90도 회전
             points = (sized_image.shape[0] - size_points[i][0][1] - 22, size_points[i][0][0] + 30)
+            result_image = cv2.putText(result_image, text, points, font, 1, (0, 0, 0), 1, cv2.LINE_AA)
             sized_image = cv2.putText(sized_image, text, points, font, 1, (0, 0, 0), 1, cv2.LINE_AA)
+            result_image = cv2.rotate(result_image, cv2.ROTATE_90_COUNTERCLOCKWISE)  # 반시계 방향으로 90도 회전
             sized_image = cv2.rotate(sized_image, cv2.ROTATE_90_COUNTERCLOCKWISE)  # 반시계 방향으로 90도 회전
         elif size_points[i][0][0] > upper_right[0]:
+            result_image = cv2.rotate(result_image, cv2.ROTATE_90_COUNTERCLOCKWISE)  # 반시계 방향으로 90도 회전
             sized_image = cv2.rotate(sized_image, cv2.ROTATE_90_COUNTERCLOCKWISE)  # 반시계 방향으로 90도 회전
             points = (size_points[i][0][1] - 21, sized_image.shape[1] - size_points[i][0][0] - 10)
+            result_image = cv2.putText(result_image, text, points, font, 1, (0, 0, 0), 1, cv2.LINE_AA)
             sized_image = cv2.putText(sized_image, text, points, font, 1, (0, 0, 0), 1, cv2.LINE_AA)
+            result_image = cv2.rotate(result_image, cv2.ROTATE_90_CLOCKWISE)  # 시계 방향으로 90도 회전
             sized_image = cv2.rotate(sized_image, cv2.ROTATE_90_CLOCKWISE)  # 시계 방향으로 90도 회전
         else:
             points = (size_points[i][0][0] + 2, size_points[i][0][1])
+            result_image = cv2.putText(result_image, text, points, font, 1, (0, 0, 0), 1, cv2.LINE_AA)
             sized_image = cv2.putText(sized_image, text, points, font, 1, (0, 0, 0), 1, cv2.LINE_AA)
 
     # 치수선 기입
@@ -331,64 +339,462 @@ def main():
             if i == 0:
                 pt1 = (size_lines[i][j][0] + 10, size_lines[i][j][1])
                 pt2 = (size_lines[i][j][0] + 70, size_lines[i][j][1])
+                cv2.line(result_image, pt1, pt2, (0, 0, 0), 1)
                 cv2.line(sized_image, pt1, pt2, (0, 0, 0), 1)
                 pt1 = (size_lines[i][j][2] + 10, size_lines[i][j][3])
                 pt2 = (size_lines[i][j][2] + 70, size_lines[i][j][3])
+                cv2.line(result_image, pt1, pt2, (0, 0, 0), 1)
                 cv2.line(sized_image, pt1, pt2, (0, 0, 0), 1)
                 pt1 = (size_lines[i][j][0] + 60, size_lines[i][j][1] - 10)
                 pt2 = (size_lines[i][j][0] + 60, size_lines[i][j][3] + 10)
+                cv2.line(result_image, pt1, pt2, (0, 0, 0), 1)
                 cv2.line(sized_image, pt1, pt2, (0, 0, 0), 1)
                 center = (size_lines[i][j][0] + 60, size_lines[i][j][1])
+                cv2.circle(result_image, center, 2, (0, 0, 0), 2)
                 cv2.circle(sized_image, center, 2, (0, 0, 0), 2)
                 center = (size_lines[i][j][0] + 60, size_lines[i][j][3])
+                cv2.circle(result_image, center, 2, (0, 0, 0), 2)
                 cv2.circle(sized_image, center, 2, (0, 0, 0), 2)
             if i == 1:
                 pt1 = (size_lines[i][j][0], size_lines[i][j][1] + 10)
                 pt2 = (size_lines[i][j][0], size_lines[i][j][1] + 70)
+                cv2.line(result_image, pt1, pt2, (0, 0, 0), 1)
                 cv2.line(sized_image, pt1, pt2, (0, 0, 0), 1)
                 pt1 = (size_lines[i][j][2], size_lines[i][j][3] + 10)
                 pt2 = (size_lines[i][j][2], size_lines[i][j][3] + 70)
+                cv2.line(result_image, pt1, pt2, (0, 0, 0), 1)
                 cv2.line(sized_image, pt1, pt2, (0, 0, 0), 1)
                 pt1 = (size_lines[i][j][0] + 10, size_lines[i][j][1] + 60)
                 pt2 = (size_lines[i][j][2] - 10, size_lines[i][j][1] + 60)
+                cv2.line(result_image, pt1, pt2, (0, 0, 0), 1)
                 cv2.line(sized_image, pt1, pt2, (0, 0, 0), 1)
                 center = (size_lines[i][j][0], size_lines[i][j][1] + 60)
+                cv2.circle(result_image, center, 2, (0, 0, 0), 2)
                 cv2.circle(sized_image, center, 2, (0, 0, 0), 2)
                 center = (size_lines[i][j][2], size_lines[i][j][1] + 60)
+                cv2.circle(result_image, center, 2, (0, 0, 0), 2)
                 cv2.circle(sized_image, center, 2, (0, 0, 0), 2)
             if i == 2:
                 pt1 = (size_lines[i][j][0] - 10, size_lines[i][j][1])
                 pt2 = (size_lines[i][j][0] - 70, size_lines[i][j][1])
+                cv2.line(result_image, pt1, pt2, (0, 0, 0), 1)
                 cv2.line(sized_image, pt1, pt2, (0, 0, 0), 1)
                 pt1 = (size_lines[i][j][2] - 10, size_lines[i][j][3])
                 pt2 = (size_lines[i][j][2] - 70, size_lines[i][j][3])
+                cv2.line(result_image, pt1, pt2, (0, 0, 0), 1)
                 cv2.line(sized_image, pt1, pt2, (0, 0, 0), 1)
                 pt1 = (size_lines[i][j][0] - 60, size_lines[i][j][1] + 10)
                 pt2 = (size_lines[i][j][0] - 60, size_lines[i][j][3] - 10)
+                cv2.line(result_image, pt1, pt2, (0, 0, 0), 1)
                 cv2.line(sized_image, pt1, pt2, (0, 0, 0), 1)
                 center = (size_lines[i][j][0] - 60, size_lines[i][j][1])
+                cv2.circle(result_image, center, 2, (0, 0, 0), 2)
                 cv2.circle(sized_image, center, 2, (0, 0, 0), 2)
                 center = (size_lines[i][j][0] - 60, size_lines[i][j][3])
+                cv2.circle(result_image, center, 2, (0, 0, 0), 2)
                 cv2.circle(sized_image, center, 2, (0, 0, 0), 2)
             if i == 3:
                 pt1 = (size_lines[i][j][0], size_lines[i][j][1] - 10)
                 pt2 = (size_lines[i][j][0], size_lines[i][j][1] - 70)
+                cv2.line(result_image, pt1, pt2, (0, 0, 0), 1)
                 cv2.line(sized_image, pt1, pt2, (0, 0, 0), 1)
                 pt1 = (size_lines[i][j][2], size_lines[i][j][3] - 10)
                 pt2 = (size_lines[i][j][2], size_lines[i][j][3] - 70)
+                cv2.line(result_image, pt1, pt2, (0, 0, 0), 1)
                 cv2.line(sized_image, pt1, pt2, (0, 0, 0), 1)
                 pt1 = (size_lines[i][j][0] - 10, size_lines[i][j][1] - 60)
                 pt2 = (size_lines[i][j][2] + 10, size_lines[i][j][1] - 60)
+                cv2.line(result_image, pt1, pt2, (0, 0, 0), 1)
                 cv2.line(sized_image, pt1, pt2, (0, 0, 0), 1)
                 center = (size_lines[i][j][0], size_lines[i][j][1] - 60)
+                cv2.circle(result_image, center, 2, (0, 0, 0), 2)
                 cv2.circle(sized_image, center, 2, (0, 0, 0), 2)
                 center = (size_lines[i][j][2], size_lines[i][j][1] - 60)
+                cv2.circle(result_image, center, 2, (0, 0, 0), 2)
                 cv2.circle(sized_image, center, 2, (0, 0, 0), 2)
 
-    cv2.imshow('sized_image', sized_image)
-    cv2.waitKey(0)
-    cv2.imwrite('solidraw/static/img/after.png', sized_image)
-    cv2.destroyAllWindows()
+    #cv2.imshow('Sized Image', sized_image)
+    # cv2.waitKey(0)
+
+    pt1 = upper_left
+    pt2 = lower_right
+    cv2.rectangle(result_image, pt1, pt2, (200, 200, 200), -1)
+    cv2.rectangle(result_image, pt1, pt2, (0, 0, 0), 2)
+
+    # 문 좌표 (좌상, 우상, 좌하, 우하)
+    doors_points = [[], [], [], []]
+
+    # 벽 내부의 실제 생활 공간 좌표
+    inner_room = []
+
+    for i in range(len(rooms_points)):
+        left_boundary_check = True
+        up_boundary_check = True
+        right_boundary_check = True
+        low_boundary_check = True
+
+        pt1 = (rooms_points[i][0][0] + 3, rooms_points[i][0][1] + 3)
+        pt2 = (rooms_points[i][1][0] - 3, rooms_points[i][1][1] - 3)
+        if rooms_points[i][0][0] == upper_left[0]:
+            pt1 = (rooms_points[i][0][0] + 10, pt1[1])
+            left_boundary_check = False
+        if rooms_points[i][0][1] == upper_left[1]:
+            pt1 = (pt1[0], rooms_points[i][0][1] + 10)
+            up_boundary_check = False
+        if rooms_points[i][1][0] == lower_right[0]:
+            pt2 = (rooms_points[i][1][0] - 10, pt2[1])
+            right_boundary_check = False
+        if rooms_points[i][1][1] == lower_right[1]:
+            pt2 = (pt2[0], rooms_points[i][1][1] - 10)
+            low_boundary_check = False
+
+        cv2.rectangle(result_image, pt1, pt2, (255, 255, 255), -1)
+        cv2.rectangle(result_image, pt1, pt2, (0, 0, 0), 2)
+        inner_room.append([pt1, pt2])
+
+        if left_boundary_check and up_boundary_check:
+            doors_points[0].append([(pt1[0] + 5, pt1[1]), (pt1[0] + 50, pt1[1] - 6)])
+        elif right_boundary_check and up_boundary_check:
+            doors_points[1].append([(pt2[0] - 5, pt1[1]), (pt2[0] - 50, pt1[1] - 6)])
+        elif left_boundary_check and low_boundary_check:
+            doors_points[2].append([(pt1[0], pt2[1] - 5), (pt1[0] - 6, pt2[1] - 50)])
+        elif right_boundary_check and low_boundary_check:
+            doors_points[3].append([(pt2[0], pt2[1] - 5), (pt2[0] + 6, pt2[1] - 50)])
+
+    x_check = False
+    y_check = False
+    for i in range(len(doors_points)):
+        for j in range(len(doors_points[i])):
+            for m in range(len(doors_points)):
+                for n in range(len(doors_points[m])):
+                    if doors_points[i][j][0][0] == doors_points[m][n][1][0]:
+                        x_check = True
+                    if doors_points[i][j][1][1] == doors_points[m][n][1][1]:
+                        y_check = True
+                    if x_check and y_check:
+                        doors_points[m].pop(n)
+
+    for i in range(len(doors_points)):
+        for j in range(len(doors_points[i])):
+            cv2.rectangle(result_image, doors_points[i][j][0], doors_points[i][j][1], (255, 255, 255), -1)
+            if i == 0:
+                pt1 = doors_points[i][j][0][0], doors_points[i][j][1][1]
+                pt2 = doors_points[i][j][0][0], doors_points[i][j][1][1] - 45
+                cv2.line(result_image, pt1, pt2, (150, 150, 150), 1)
+
+                pt1 = doors_points[i][j][0][0], doors_points[i][j][0][1]
+                pt2 = doors_points[i][j][1][0], doors_points[i][j][0][1]
+                cv2.line(result_image, pt1, pt2, (150, 150, 150), 1)
+                pt1 = doors_points[i][j][0][0], doors_points[i][j][1][1]
+                pt2 = doors_points[i][j][1][0], doors_points[i][j][1][1]
+                cv2.line(result_image, pt1, pt2, (150, 150, 150), 1)
+
+                cv2.ellipse(result_image, pt1, (45, 45), 0, 270, 360, (150, 150, 150), 1)
+
+                pt1 = doors_points[i][j][0][0], doors_points[i][j][0][1]
+                pt2 = doors_points[i][j][0][0], doors_points[i][j][1][1]
+                cv2.line(result_image, pt1, pt2, (0, 0, 0), 2)
+                pt1 = doors_points[i][j][1][0], doors_points[i][j][0][1]
+                pt2 = doors_points[i][j][1][0], doors_points[i][j][1][1]
+                cv2.line(result_image, pt1, pt2, (0, 0, 0), 2)
+            if i == 1:
+                pt1 = doors_points[i][j][0][0], doors_points[i][j][1][1]
+                pt2 = doors_points[i][j][0][0], doors_points[i][j][1][1] - 45
+                cv2.line(result_image, pt1, pt2, (150, 150, 150), 1)
+
+                pt1 = doors_points[i][j][0][0], doors_points[i][j][0][1]
+                pt2 = doors_points[i][j][1][0], doors_points[i][j][0][1]
+                cv2.line(result_image, pt1, pt2, (150, 150, 150), 1)
+                pt1 = doors_points[i][j][0][0], doors_points[i][j][1][1]
+                pt2 = doors_points[i][j][1][0], doors_points[i][j][1][1]
+                cv2.line(result_image, pt1, pt2, (150, 150, 150), 1)
+
+                cv2.ellipse(result_image, pt1, (45, 45), 0, 180, 270, (150, 150, 150), 1)
+
+                pt1 = doors_points[i][j][0][0], doors_points[i][j][0][1]
+                pt2 = doors_points[i][j][0][0], doors_points[i][j][1][1]
+                cv2.line(result_image, pt1, pt2, (0, 0, 0), 2)
+                pt1 = doors_points[i][j][1][0], doors_points[i][j][0][1]
+                pt2 = doors_points[i][j][1][0], doors_points[i][j][1][1]
+                cv2.line(result_image, pt1, pt2, (0, 0, 0), 2)
+            if i == 2:
+                pt1 = doors_points[i][j][1][0], doors_points[i][j][0][1]
+                pt2 = doors_points[i][j][1][0] - 45, doors_points[i][j][0][1]
+                cv2.line(result_image, pt1, pt2, (150, 150, 150), 1)
+
+                pt1 = doors_points[i][j][0][0], doors_points[i][j][0][1]
+                pt2 = doors_points[i][j][0][0], doors_points[i][j][1][1]
+                cv2.line(result_image, pt1, pt2, (150, 150, 150), 1)
+                pt1 = doors_points[i][j][1][0], doors_points[i][j][0][1]
+                pt2 = doors_points[i][j][1][0], doors_points[i][j][1][1]
+                cv2.line(result_image, pt1, pt2, (150, 150, 150), 1)
+
+                cv2.ellipse(result_image, pt1, (45, 45), 0, 180, 270, (150, 150, 150), 1)
+
+                pt1 = doors_points[i][j][0][0], doors_points[i][j][0][1]
+                pt2 = doors_points[i][j][1][0], doors_points[i][j][0][1]
+                cv2.line(result_image, pt1, pt2, (0, 0, 0), 2)
+                pt1 = doors_points[i][j][0][0], doors_points[i][j][1][1]
+                pt2 = doors_points[i][j][1][0], doors_points[i][j][1][1]
+                cv2.line(result_image, pt1, pt2, (0, 0, 0), 2)
+            if i == 3:
+                pt1 = doors_points[i][j][1][0], doors_points[i][j][0][1]
+                pt2 = doors_points[i][j][1][0] - 45, doors_points[i][j][0][1]
+                cv2.line(result_image, pt1, pt2, (150, 150, 150), 1)
+
+                pt1 = doors_points[i][j][0][0], doors_points[i][j][0][1]
+                pt2 = doors_points[i][j][0][0], doors_points[i][j][1][1]
+                cv2.line(result_image, pt1, pt2, (150, 150, 150), 1)
+                pt1 = doors_points[i][j][1][0], doors_points[i][j][0][1]
+                pt2 = doors_points[i][j][1][0], doors_points[i][j][1][1]
+                cv2.line(result_image, pt1, pt2, (150, 150, 150), 1)
+
+                cv2.ellipse(result_image, pt1, (45, 45), 0, 270, 360, (150, 150, 150), 1)
+
+                pt1 = doors_points[i][j][0][0], doors_points[i][j][0][1]
+                pt2 = doors_points[i][j][1][0], doors_points[i][j][0][1]
+                cv2.line(result_image, pt1, pt2, (0, 0, 0), 2)
+                pt1 = doors_points[i][j][0][0], doors_points[i][j][1][1]
+                pt2 = doors_points[i][j][1][0], doors_points[i][j][1][1]
+                cv2.line(result_image, pt1, pt2, (0, 0, 0), 2)
+
+    # print(OCR_room)
+    # print(inner_room)
+
+    for i in range(len(inner_room)):
+        left_boundary_check = False
+        up_boundary_check = False
+        right_boundary_check = False
+        low_boundary_check = False
+
+        if rooms_points[i][0][0] == upper_left[0]:
+            pt1 = (rooms_points[i][0][0] + 10, pt1[1])
+            left_boundary_check = True
+        if rooms_points[i][0][1] == upper_left[1]:
+            pt1 = (pt1[0], rooms_points[i][0][1] + 10)
+            up_boundary_check = True
+        if rooms_points[i][1][0] == lower_right[0]:
+            pt2 = (rooms_points[i][1][0] - 10, pt2[1])
+            right_boundary_check = True
+        if rooms_points[i][1][1] == lower_right[1]:
+            pt2 = (pt2[0], rooms_points[i][1][1] - 10)
+            low_boundary_check = True
+
+        for j in range(len(OCR_room)):
+            if inner_room[i][0][0] < OCR_room[j][1] < inner_room[i][1][0]:
+                if inner_room[i][0][1] < OCR_room[j][2] < inner_room[i][1][1]:
+                    if OCR_room[j][0] == '화장실':
+                        # print(OCR_room[j][0])
+                        # print(inner_room[i])
+                        # print(left_boundary_check, up_boundary_check, right_boundary_check, low_boundary_check)
+
+                        if left_boundary_check and up_boundary_check:
+                            pt1 = (inner_room[i][0][0], inner_room[i][0][1] + 5)
+                            pt2 = (inner_room[i][1][0], inner_room[i][0][1] + 5)
+                            cv2.line(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 10, inner_room[i][0][1] + 25)
+                            pt2 = (inner_room[i][0][0] + 45, inner_room[i][0][1] + 5)
+                            cv2.rectangle(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 12, inner_room[i][0][1] + 23)
+                            pt2 = (inner_room[i][0][0] + 43, inner_room[i][0][1] + 7)
+                            cv2.rectangle(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 28, inner_room[i][0][1] + 5)
+                            pt2 = (inner_room[i][0][0] + 28, inner_room[i][0][1] + 15)
+                            cv2.line(result_image, pt1, pt2, (0, 0, 0), 2)
+
+                            center = (inner_room[i][0][0] + 28, inner_room[i][0][1] + 15)
+                            cv2.circle(result_image, center, 2, (0, 0, 0), 2)
+
+                            pt1 = (inner_room[i][0][0] + 66, inner_room[i][0][1] + 20)
+                            pt2 = (inner_room[i][0][0] + 90, inner_room[i][0][1] + 5)
+                            cv2.rectangle(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 68, inner_room[i][0][1] + 20)
+                            pt2 = (inner_room[i][0][0] + 88, inner_room[i][0][1] + 40)
+                            cv2.rectangle(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            center = (inner_room[i][0][0] + 78, inner_room[i][0][1] + 30)
+                            cv2.circle(result_image, center, 8, (0, 0, 0), 1)
+                        elif right_boundary_check and up_boundary_check:
+                            pt1 = (inner_room[i][0][0], inner_room[i][0][1] + 5)
+                            pt2 = (inner_room[i][1][0], inner_room[i][0][1] + 5)
+                            cv2.line(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 10, inner_room[i][0][1] + 25)
+                            pt2 = (inner_room[i][0][0] + 45, inner_room[i][0][1] + 5)
+                            cv2.rectangle(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 12, inner_room[i][0][1] + 23)
+                            pt2 = (inner_room[i][0][0] + 43, inner_room[i][0][1] + 7)
+                            cv2.rectangle(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 28, inner_room[i][0][1] + 5)
+                            pt2 = (inner_room[i][0][0] + 28, inner_room[i][0][1] + 15)
+                            cv2.line(result_image, pt1, pt2, (0, 0, 0), 2)
+
+                            center = (inner_room[i][0][0] + 28, inner_room[i][0][1] + 15)
+                            cv2.circle(result_image, center, 2, (0, 0, 0), 2)
+
+                            pt1 = (inner_room[i][0][0] + 66, inner_room[i][0][1] + 20)
+                            pt2 = (inner_room[i][0][0] + 90, inner_room[i][0][1] + 5)
+                            cv2.rectangle(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 68, inner_room[i][0][1] + 20)
+                            pt2 = (inner_room[i][0][0] + 88, inner_room[i][0][1] + 40)
+                            cv2.rectangle(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            center = (inner_room[i][0][0] + 78, inner_room[i][0][1] + 30)
+                            cv2.circle(result_image, center, 8, (0, 0, 0), 1)
+                        elif left_boundary_check and low_boundary_check:
+                            pt1 = (inner_room[i][0][0], inner_room[i][1][1] - 5)
+                            pt2 = (inner_room[i][1][0], inner_room[i][1][1] - 5)
+                            cv2.line(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 10, inner_room[i][1][1] - 25)
+                            pt2 = (inner_room[i][0][0] + 45, inner_room[i][1][1] - 5)
+                            cv2.rectangle(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 12, inner_room[i][1][1] - 23)
+                            pt2 = (inner_room[i][0][0] + 43, inner_room[i][1][1] - 7)
+                            cv2.rectangle(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 28, inner_room[i][1][1] - 5)
+                            pt2 = (inner_room[i][0][0] + 28, inner_room[i][1][1] - 15)
+                            cv2.line(result_image, pt1, pt2, (0, 0, 0), 2)
+
+                            center = (inner_room[i][0][0] + 28, inner_room[i][1][1] - 15)
+                            cv2.circle(result_image, center, 2, (0, 0, 0), 2)
+
+                            pt1 = (inner_room[i][0][0] + 66, inner_room[i][1][1] - 20)
+                            pt2 = (inner_room[i][0][0] + 90, inner_room[i][1][1] - 5)
+                            cv2.rectangle(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 68, inner_room[i][1][1] - 20)
+                            pt2 = (inner_room[i][0][0] + 88, inner_room[i][1][1] - 40)
+                            cv2.rectangle(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            center = (inner_room[i][0][0] + 78, inner_room[i][1][1] - 30)
+                            cv2.circle(result_image, center, 8, (0, 0, 0), 1)
+                        elif right_boundary_check and low_boundary_check:
+                            pt1 = (inner_room[i][0][0], inner_room[i][1][1] - 5)
+                            pt2 = (inner_room[i][1][0], inner_room[i][1][1] - 5)
+                            cv2.line(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 10, inner_room[i][1][1] - 25)
+                            pt2 = (inner_room[i][0][0] + 45, inner_room[i][1][1] - 5)
+                            cv2.rectangle(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 12, inner_room[i][1][1] - 23)
+                            pt2 = (inner_room[i][0][0] + 43, inner_room[i][1][1] - 7)
+                            cv2.rectangle(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 28, inner_room[i][1][1] - 5)
+                            pt2 = (inner_room[i][0][0] + 28, inner_room[i][1][1] - 15)
+                            cv2.line(result_image, pt1, pt2, (0, 0, 0), 2)
+
+                            center = (inner_room[i][0][0] + 28, inner_room[i][1][1] - 15)
+                            cv2.circle(result_image, center, 2, (0, 0, 0), 2)
+
+                            pt1 = (inner_room[i][0][0] + 66, inner_room[i][1][1] - 20)
+                            pt2 = (inner_room[i][0][0] + 90, inner_room[i][1][1] - 5)
+                            cv2.rectangle(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 68, inner_room[i][1][1] - 20)
+                            pt2 = (inner_room[i][0][0] + 88, inner_room[i][1][1] - 40)
+                            cv2.rectangle(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            center = (inner_room[i][0][0] + 78, inner_room[i][1][1] - 30)
+                            cv2.circle(result_image, center, 8, (0, 0, 0), 1)
+
+                    if OCR_room[j][0] == '주방':
+                        # print(OCR_room[j][0])
+                        # print(inner_room[i])
+                        # print(left_boundary_check, up_boundary_check, right_boundary_check, low_boundary_check)
+
+                        if left_boundary_check and up_boundary_check:
+                            pt1 = (inner_room[i][0][0], inner_room[i][0][1] + 30)
+                            pt2 = (inner_room[i][1][0], inner_room[i][0][1] + 30)
+                            cv2.line(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 15, inner_room[i][0][1] + 25)
+                            pt2 = (inner_room[i][0][0] + 50, inner_room[i][0][1] + 5)
+                            cv2.rectangle(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 17, inner_room[i][0][1] + 23)
+                            pt2 = (inner_room[i][0][0] + 48, inner_room[i][0][1] + 7)
+                            cv2.rectangle(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 33, inner_room[i][0][1] + 5)
+                            pt2 = (inner_room[i][0][0] + 33, inner_room[i][0][1] + 15)
+                            cv2.line(result_image, pt1, pt2, (0, 0, 0), 2)
+
+                            center = (inner_room[i][0][0] + 33, inner_room[i][0][1] + 15)
+                            cv2.circle(result_image, center, 2, (0, 0, 0), 2)
+                        elif right_boundary_check and up_boundary_check:
+                            pt1 = (inner_room[i][0][0], inner_room[i][0][1] + 30)
+                            pt2 = (inner_room[i][1][0], inner_room[i][0][1] + 30)
+                            cv2.line(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 15, inner_room[i][0][1] + 25)
+                            pt2 = (inner_room[i][0][0] + 50, inner_room[i][0][1] + 5)
+                            cv2.rectangle(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 17, inner_room[i][0][1] + 23)
+                            pt2 = (inner_room[i][0][0] + 48, inner_room[i][0][1] + 7)
+                            cv2.rectangle(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 33, inner_room[i][0][1] + 5)
+                            pt2 = (inner_room[i][0][0] + 33, inner_room[i][0][1] + 15)
+                            cv2.line(result_image, pt1, pt2, (0, 0, 0), 2)
+
+                            center = (inner_room[i][0][0] + 33, inner_room[i][0][1] + 15)
+                            cv2.circle(result_image, center, 2, (0, 0, 0), 2)
+                        elif left_boundary_check and low_boundary_check:
+                            pt1 = (inner_room[i][0][0], inner_room[i][1][1] - 30)
+                            pt2 = (inner_room[i][1][0], inner_room[i][1][1] - 30)
+                            cv2.line(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 15, inner_room[i][1][1] - 25)
+                            pt2 = (inner_room[i][0][0] + 50, inner_room[i][1][1] - 5)
+                            cv2.rectangle(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 17, inner_room[i][1][1] - 23)
+                            pt2 = (inner_room[i][0][0] + 48, inner_room[i][1][1] - 7)
+                            cv2.rectangle(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 33, inner_room[i][1][1] - 5)
+                            pt2 = (inner_room[i][0][0] + 33, inner_room[i][1][1] - 15)
+                            cv2.line(result_image, pt1, pt2, (0, 0, 0), 2)
+
+                            center = (inner_room[i][0][0] + 33, inner_room[i][1][1] - 15)
+                            cv2.circle(result_image, center, 2, (0, 0, 0), 2)
+                        elif right_boundary_check and low_boundary_check:
+                            pt1 = (inner_room[i][0][0], inner_room[i][1][1] - 30)
+                            pt2 = (inner_room[i][1][0], inner_room[i][1][1] - 30)
+                            cv2.line(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 15, inner_room[i][1][1] - 25)
+                            pt2 = (inner_room[i][0][0] + 50, inner_room[i][1][1] - 5)
+                            cv2.rectangle(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 17, inner_room[i][1][1] - 23)
+                            pt2 = (inner_room[i][0][0] + 48, inner_room[i][1][1] - 7)
+                            cv2.rectangle(result_image, pt1, pt2, (0, 0, 0), 1)
+
+                            pt1 = (inner_room[i][0][0] + 33, inner_room[i][1][1] - 5)
+                            pt2 = (inner_room[i][0][0] + 33, inner_room[i][1][1] - 15)
+                            cv2.line(result_image, pt1, pt2, (0, 0, 0), 2)
+
+                            center = (inner_room[i][0][0] + 33, inner_room[i][1][1] - 15)
+                            cv2.circle(result_image, center, 2, (0, 0, 0), 2)
+
+    # cv2.imshow('Result', result_image)
+    #cv2.waitKey(0)
+    cv2.imwrite('static/img/after.png', result_image)
+    # cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":
