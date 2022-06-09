@@ -2,7 +2,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap");
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard-dynamic-subset.css");
-@font-face {
+/* @font-face {
   font-family: "Pretendard";
   src: url("/openconcert/fonts/NotoSansKR-Regular-Hestia.woff") format("woff");
   font-style: normal;
@@ -13,7 +13,7 @@
   src: url("/openconcert/fonts/dancingscript-webfont.woff") format("woff");
   font-style: normal;
   unicode-range: U+0041-005A, U+0061-007A;
-}
+} */
 /*=============== VARIABLES CSS ===============*/
 :root {
   --header-height: 3.5rem;
@@ -294,7 +294,7 @@ button {
 
 .home__search{
   background-color: var(--body-color);
-  padding: .35rem .35rem .35rem .75rem;
+  padding: .35rem .35rem .35rem .35rem;
   display: flex;
   align-items: center;
   border-radius: .75rem;
@@ -892,4 +892,142 @@ button {
 .count_num{
   font-size: 30px;
   font-weight: bold;
+}
+
+/*========== Variables Dark theme ==========*/
+body.dark-theme{
+  /*Color mode HSL(hue, saturation, lightness)*/
+  --first-color: hsl(228, 66%, 62%);
+  --second-color: hsl(25, 57%, 54%);
+  --title-color: hsl(228, 8%, 95%);
+  --text-color: hsl(228, 8%, 70%);
+  --border-color: hsl(228, 16%, 14%);
+  --body-color: hsl(228, 12%, 8%);
+  --container-color: hsl(228, 16%, 12%);
+}
+
+/*========== 
+  Color changes in some parts of 
+  the website, in dark theme 
+==========*/
+.dark-theme .home__search,
+.dark-theme .swiper-button-next,
+.dark-theme .swiper-button-prev{
+border: 3px solid var(--border-color);
+}
+
+.dark-theme .popular__card:hover,
+.dark-theme .home__img,
+.dark-theme .nav__menu,
+.dark-theme .value__img,
+.dark-theme .accordion-open,
+.dark-theme .accordion-open .value__accordion-icon,
+.dark-theme .accordion-open .value__accordion-arrow,
+.dark-theme .conetact__img,
+.dark-theme .contact__card-box:hover,
+.dark-theme .scrollup{
+box-shadow: none;
+}
+
+.dark-theme .value__orbe,
+.dark-theme .value__accordion-icon,
+.dark-theme .value__accordion-arrow,
+.dark-theme .contact__orbe,
+.dark-theme .contact__card i,
+.dark-theme .contact__card-button,
+.dark-theme .subscribe__container{
+background-color: var(--container-color);
+}
+
+.dark-theme .subscribe__container{
+border: 6px  solid var(--border-color);
+}
+
+.dark-theme .subscribe__description{
+color: var(--text-color);
+}
+
+.dark-theme::-webkit-scrollbar{
+background-color: hsl(228, 4%, 15%);
+}
+
+.dark-theme::-webkit-scrollbar-thumb{
+background-color: hsl(228, 4% ,25%);
+}
+
+.dark-theme::-webkit-scrollbar-thumb:hover{
+background-color: hsl(228, 4% ,35%);
+}
+
+
+/* LOADING SPINNER */
+#loading {
+  display: none;
+	width: 100%;
+	height: 100%;
+}
+
+@keyframes spinner {
+  from {transform: rotate(0deg); }
+  to {transform: rotate(360deg);}
+}
+
+#loading .spinner {
+  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 32px;
+  height: 32px;
+  margin-top: -32px;
+  margin-left: -32px;
+  border-radius: 50%;
+  border: 8px solid transparent;
+  border-top-color: var(--first-color);
+  border-bottom-color: var(--first-color);
+  animation: spinner .8s ease infinite;
+}
+
+
+/* upload button hiding */
+.upload_image input[type="file"] {  /* 파일 필드 숨기기 */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip:rect(0,0,0,0);
+  border: 0;
+}
+
+.mainbtn {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#upload__button{
+  text-align: center;
+  cursor: pointer;
+}
+
+#submit__button {
+  display:none;
+  text-align: center;
+  cursor: pointer;
+}
+
+.result_img {
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  max-width: 100%;
+  /* display: none; */
+  transition: .3s;
+}
+
+#image-show{
+  transition: .4s;
 }

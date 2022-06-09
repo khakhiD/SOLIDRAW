@@ -1,51 +1,539 @@
-<!doctype html>
-<html>
-  <head>
-    <title>File Upload</title>
-    <link rel="stylesheet" href="./static/css/dropzone.css">
-  </head>
-  <body>
-    <h1>이미지 등록하기</h1>
-    <form action="{{ url_for('upload_files') }}" class="dropzone">
-    </form>
-    <br>
-    <input type="button" id="button0" onclick="button0_click();" value="서버에서 사진 지우기" />
-    <br>
-    <script>
-    function button0_click(){
-      function FileDel(){
-        var myObject;
-        myObject = new ActiveXObject("Scripting.FileSystemObject");
-        myObject.DeleteFile("./static/img/before.png");
-      }
-      FileDel();
-     }
-    </script>
-    <script src="./static/js/drop_img.js"></script>
-    <br><br>
-    <h2>등록된 사진</h2>
-    <button onclick="page_update()">등록한 이미지 확인을 위해 클릭!</button>
-    <script>
-      function page_update() {
-      location.reload(true);
-      }
-    </script>
-    <p><img src="./static/img/before.png"/></p>
-    <br><br>
-    <input type="button" id="button1" onclick="button1_click('hello');" value="변환" />
-    <br>
-    <script>
-      function button1_click(s) {
-      function display_image(src, alt) {
-      var a = document.createElement("img");
-      a.src = src;
-      a.alt = alt;
-      document.body.appendChild(a);
-      }
-      display_image('./static/img/after.png',
-                 '변환된 도면');}
-    </script>
-    <a href="./static/img/after.png" download><button>다운</button></a>
+<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  </body>
+        <!--=============== FAVICON ===============-->
+        <link rel="shortcut icon" href="" type="image/x-icon">
+
+        <!--=============== BOXICONS ===============-->
+        <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
+        
+        <!--=============== SWIPER CSS ===============-->
+        <link rel="stylesheet" href="{{url_for('static', filename='css/swiper-bundle.min.css')}}">
+        <!--================ WEB FONTS ===============-->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <!--=============== CSS ===============-->
+        <link rel="stylesheet" href="{{url_for('static', filename='css/styles.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename='css/screen.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename='css/upload.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename='css/dropzone.css')}}">
+
+        <title>SOLIDRAW - Applied NEW Design Templates</title>
+    </head>
+    <body>
+        <!--==================== HEADER ====================-->
+        <header class="header" id="header">
+            <nav class="nav container">
+                <a href="#" class="nav__logo">
+                    <i class="bx bx-transfer-alt"></i>SOLIDRAW
+                </a>
+
+                <div class="nav__menu">
+                    <ul class="nav__list">
+                        <li class="nav__item">
+                            <a href="#home" class="nav__link active-link">
+                                <i class="bx bx-home-alt-2"></i>
+                                <span>홈</span>
+                            </a>
+                        </li>
+                        <li class="nav__item">
+                            <a href="#popular" class="nav__link" >
+                                <i class='bx bx-notepad' ></i>
+                                <span>가이드</span>
+                            </a>
+                        </li>
+                        <li class="nav__item">
+                            <a href="#value" class="nav__link">
+                                <i class="bx bx-award"></i>
+                                <span>가치</span>
+                            </a>
+                        </li>
+                        <li class="nav__item">
+                            <a href="#contact" class="nav__link">
+                                <i class="bx bx-phone"></i>
+                                <span>컨택트</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Theme change button -->
+                <i class="bx bx-moon change-theme" id="theme-button"></i>
+                <a href="#" class="button nav__button">
+                    변환하기
+                </a>
+            </nav>
+        </header>
+
+        <!--==================== MAIN ====================-->
+        <main class="main">
+            <!--==================== HOME ====================-->
+            <section class="home section" id="home">
+                <div class="home__container container grid">
+                    <div class="home__data">
+                        <h1 class="home__title">
+                            Rough to<br>Solid for<br>your sketch
+                        </h1>
+                        <p class="home__description">
+                            여러분의 러프 스케치를 솔리드한 도면으로 변환하세요.
+                        </p>
+                        <!---UPLOAD IMAGE DIV -->
+                        <div class="upload_image">
+                            <form name="upload_image" method="post" enctype="multipart/form-data" action="{{ url_for('upload_files') }}" class="home__search">
+                                <i class="bx bxs-file-image" style="margin:1rem"></i>
+                                <!-- bx bxs-file-image -->
+                                <span class="upload__name" id="fileName">변환할 파일을 선택하세요.</span>
+                                <!-- <input type="search" placeholder="Convert by your sketch images..." class="home__search-input"> -->
+
+                                <div class="mainbtn button">
+                                    <label for="submitBtn" onclick="" id="submit__button" style="display:none">변환</label>
+                                    <label for="chooseFile" id="upload__button">파일선택</label>
+                                    <input type="file" id="chooseFile" name="file" accept="image/*">
+                                    <script>
+                                        let file = document.getElementById('chooseFile');
+                                        file.onchange = function(e){
+                                            loadFile(this)
+                                            let files = e.target.files;
+                                            if(files !== null){
+                                                upload_image.submit();
+                                            }
+                                        }
+                                    </script>
+                                </div>
+                            </form>
+                            <div class="result_img home__search" id="image-show">
+                            </div>
+                            <div class="loading"><div class="spinner"></div></div>
+                        </div>
+                        
+                        <div class="home__value">
+                            <div>
+                                <h1 class="home__value-number">
+                                    9K<span>+</span>
+                                    <div class="count_num"></div>
+                                </h1>
+                                <span class="home__value-description">
+                                    변환된 <br> 파일
+                                </span>
+                            </div>
+                            <div>
+                                <h1 class="home__value-number">
+                                    100<span>+</span>
+                                </h1>
+                                <span class="home__value-description">
+                                    개같은<br>커밋 수
+                                </span>
+                            </div>
+                            <div>
+                                <h1 class="home__value-number">
+                                    1<span>+</span>
+                                </h1>
+                                <span class="home__value-description">
+                                    어워드 <br> 우승
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="home__images">
+                        <div class="home__orbe">
+                            <div class="home__img">
+                                <img src="{{url_for('static', filename="img/art.svg")}}" alt=""/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!--==================== LOGOS ====================-->
+            <section class="logos section">
+                <div class="logos__container container grid">
+                    <div class="logos__img">
+                        <img src="{{url_for('static', filename="img/logo_1.png")}}" alt="">
+                    </div>
+                    <div class="logos__img">
+                        <img src="{{url_for('static', filename="img/logo_2.png")}}" alt="">
+                    </div>
+                    <div class="logos__img">
+                        <img src="{{url_for('static', filename="img/logo_3.png")}}" alt="">
+                    </div>
+                    <div class="logos__img">
+                        <img src="{{url_for('static', filename="img/logo_4.png")}}" alt="">
+                    </div>
+                </div>
+            </section>
+
+            <!--==================== POPULAR ====================-->
+            <section class="popular section" id="popular">
+                <div class="container">
+                    <span class="section__subtitle">
+                        사용 가이드
+                    </span>
+                    <h2 class="section__title">
+                        Guide<span>.</span>
+                    </h2>
+                </div>
+
+                <div class="popular__container swiper">
+                    <div class="swiper-wrapper">
+                        <article class="popular__card swiper-slide">
+                            <img src="{{url_for('static', filename="img/guide_1.png")}}" alt="" class="popular__img">
+                            <div class="popular__data">
+                                <h2 class="popular__price">
+                                    Step <span>1</span>
+                                </h2>
+                                <h3 class="popular__title">
+                                    이미지 업로드
+                                </h3>
+                                <p class="popular__description">
+                                    파일 선택 버튼을 눌러 변환할 손 스케치 도면 파일을 업로드합니다.
+                                </p>
+                            </div>
+                        </article>
+                        <article class="popular__card swiper-slide">
+                            <img src="{{url_for('static', filename="img/popular2.jpg")}}" alt="" class="popular__img">
+                            <div class="popular__data">
+                                <h2 class="popular__price">
+                                    Step <span>2</span>
+                                </h2>
+                                <h3 class="popular__title">
+                                    옵션 및 치수 입력
+                                </h3>
+                                <p class="popular__description">
+                                    변환 옵션과 치수를 기입해줍니다.
+                                </p>
+                            </div>
+                        </article>
+                        <article class="popular__card swiper-slide">
+                            <img src="{{url_for('static', filename="img/popular3.jpg")}}" alt="" class="popular__img">
+                            <div class="popular__data">
+                                <h2 class="popular__price">
+                                    Step <span>3</span>
+                                </h2>
+                                <h3 class="popular__title">
+                                    변환
+                                </h3>
+                                <p class="popular__description">
+                                    변환하기 버튼을 눌러 도면을 변환합니다.
+                                </p>
+                            </div>
+                        </article>
+                        <article class="popular__card swiper-slide">
+                            <img src="{{url_for('static', filename="img/popular4.jpg")}}" alt="" class="popular__img">
+                            <div class="popular__data">
+                                <h2 class="popular__price">
+                                    Step <span>4</span>
+                                </h2>
+                                <h3 class="popular__title">
+                                    다운로드
+                                </h3>
+                                <p class="popular__description">
+                                    변환된 도면을 확인하고, 다운로드할 수 있습니다.
+                                </p>
+                            </div>
+                        </article>
+                        <article class="popular__card swiper-slide">
+                            <img src="{{url_for('static', filename="img/popular5.jpg")}}" alt="" class="popular__img">
+                            <div class="popular__data">
+                                <h2 class="popular__price">
+                                    Step <span>5</span>
+                                </h2>
+                                <h3 class="popular__title">
+                                    평가하기
+                                </h3>
+                                <p class="popular__description">
+                                    완성 도면 결과에 평점을 매겨주세요.
+                                </p>
+                            </div>
+                        </article>
+                    </div>
+                    <div class="swiper-button-next">
+                        <i class="bx bx-chevron-right"></i>
+                    </div>
+                    <div class="swiper-button-prev">
+                        <i class="bx bx-chevron-left"></i>
+                    </div>
+                </div>
+            </section>
+
+            <!--==================== VALUE ====================-->
+            <section class="value section" id="value">
+                <div class="value__container container grid">
+                    <div class="value__images">
+                        <div class="value__orbe"></div>
+                        <div class="value__img">
+                            <img src="{{url_for('static', filename="img/value.svg")}}" alt="">
+                        </div>
+                    </div>
+                    <div class="value__content">
+                        <div class="value__data">
+                            <span class="section__subtitle">가치</span>
+                            <h2 class="section__title">Value<span>.</span></h2>
+                            <p class="value__description">
+                                
+                            </p>
+                        </div>
+
+                        <div class="value__accordion">
+                            <div class="value__accordion-item">
+                                <header class="value__accordion-header">
+                                    <i class="bx bxs-coin-stack value__accordion-icon"></i>
+                                    <h3 class="value__accordion-title">
+                                        완전한 무료 서비스 지향
+                                    </h3>
+                                    <div class="value__accordion-arrow">
+                                        <i class="bx bxs-down-arrow"></i>
+                                    </div>
+                                </header>
+                                <div class="value__accordion-content">
+                                    <p class="value__accordion-description">
+                                        솔리드로우는 완전 무료 서비스를 지향합니다.
+                                        아무런 걱정 없이 마음껏 사용해주세요.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="value__accordion-item">
+                                <header class="value__accordion-header">
+                                    <i class="bx bxs-brain value__accordion-icon"></i>
+                                    <h3 class="value__accordion-title">
+                                        딥러닝 학습으로 더 정교한 결과
+                                    </h3>
+                                    <div class="value__accordion-arrow">
+                                        <i class="bx bxs-down-arrow"></i>
+                                    </div>
+                                </header>
+                                <div class="value__accordion-content">
+                                    <p class="value__accordion-description">
+                                        변환 도면 학습으로 사용자들의 변환 횟수가
+                                        늘어남에따라 더 나은 결과를 보여(줬으면 좋겠다.)
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="value__accordion-item">
+                                <header class="value__accordion-header">
+                                    <i class="bx bxs-bar-chart-square value__accordion-icon"></i>
+                                    <h3 class="value__accordion-title">
+                                        즉각적인 피드백
+                                    </h3>
+                                    <div class="value__accordion-arrow">
+                                        <i class="bx bxs-down-arrow"></i>
+                                    </div>
+                                </header>
+                                <div class="value__accordion-content">
+                                    <p class="value__accordion-description">
+                                        여러분의 소중한 피드백을 양분삼아 성장하는 솔리드로우를 기대해주세요.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="value__accordion-item">
+                                <header class="value__accordion-header">
+                                    <i class="bx bxs-check-shield value__accordion-icon"></i>
+                                    <h3 class="value__accordion-title">
+                                        원본 데이터 보호
+                                    </h3>
+                                    <div class="value__accordion-arrow">
+                                        <i class="bx bxs-down-arrow"></i>
+                                    </div>
+                                </header>
+                                <div class="value__accordion-content">
+                                    <p class="value__accordion-description">
+                                        솔리드로우는 업로드된 데이터를 보관하지 않습니다.
+                                        변환 작업 이후, 원본은 서버에서 완전히 삭제됩니다.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!--==================== CONTACT ====================-->
+            <section class="contact section" id="contact">
+                <div class="contact__container container grid">
+                    <div class="contact__images">
+                        <div class="contact__orbe"></div>
+
+                        <div class="contact__img">
+                            <img src="{{url_for('static', filename="img/contact.svg")}}" alt="">
+                        </div>
+                    </div>
+                
+                    <div class="contact__content">
+                        <div class="contact__data">
+                            <span class="section__subtitle">컨택트</span>
+                            <h2 class="section__title">
+                                Contact<span>.</span>
+                            </h2>
+                            <p class="contact__description">
+                                사용자의 피드백은 언제나 환영합니다.
+                            </p>
+                        </div>
+
+                        <div class="contact__card">
+                            <div class="contact__card-box">
+                                <div class="contact__card-info">
+                                    <i class="bx bxs-envelope"></i>
+                                    <div>
+                                        <h3 class="contact__card-title">Message</h3>
+                                        <p class="contact__card-description">
+                                            다이렉트 메세지
+                                        </p>
+                                    </div>
+                                </div>
+                                <button class="button contact__card-button">보내기</button>
+                            </div>
+                            <div class="contact__card-box">
+                                <div class="contact__card-info">
+                                    <i class="bx bxl-discord-alt"></i>
+                                    <div>
+                                        <h3 class="contact__card-title">Discord</h3>
+                                        <p class="contact__card-description">디스코드 서버</p>
+                                    </div>
+                                </div>
+                                <button class="button contact__card-button">가입하기</button>
+                            </div>
+
+                            <div class="contact__card-box">
+                                <div class="contact__card-info">
+                                    <i class="bx bxs-message-rounded-dots"></i>
+                                    <div>
+                                        <h3 class="contact__card-title">KaKaoTalk</h3>
+                                        <p class="contact__card-description">카카오톡</p>
+                                    </div>
+                                </div>
+                                <button class="button contact__card-button">오픈채팅</button>
+                            </div>
+
+                            <div class="contact__card-box">
+                                <div class="contact__card-info">
+                                    <i class="bx bxl-github"></i>
+                                    <div>
+                                        <h3 class="contact__card-title">Github</h3>
+                                        <p class="contact__card-description">
+                                            깃허브
+                                        </p>
+                                    </div>
+                                </div>
+                                <button class="button contact__card-button">확인하기</button>
+                            </div>
+
+                        </div>
+                   </div>
+              </div>
+            </section>
+
+            <!--==================== SUBSCRIBE ====================-->
+            <section class="subscribe section">
+                <div class="subscribe__container container">
+                    <h1 class="subscribe__title">
+                        지금 바로 사용하세요
+                    </h1>
+                    <p class="subscribe__description">
+                        반듯한 도면으로 변환을 희망하는 이미지 파일을 업로드하고,<br>
+                        아래의 변환하기 버튼을 눌러 깔끔한 도면 이미지를 다운로드하세요!
+                    </p>
+                    <a href="#" class="button subscribe__button">
+                        시작하기
+                    </a>
+                </div>
+            </section>
+        </main>
+
+        <!--==================== FOOTER ====================-->
+        <footer class="footer section">
+            <div class="footer__container container grid">
+                <div>
+                    <a href="#" class="footer__logo">
+                        <i class="bx bx-transfer-alt"></i>SOLIDRAW
+                    </a>
+                    <p class="footer__description">
+                        ROUGH TO SOLID.<br>
+                        여러분의 설계 시간을 줄여줍니다.
+                    </p>
+                </div>
+
+                <div class="footer__content">
+                    <div>
+                        <h3 class="footer__title">졸업은하겠조</h3>
+                        <ul class="footer__links">
+                            <li>
+                                <a href="#" class="footer__link">About Us</a>
+                            </li>
+                            <li>
+                                <a href="#" class="footer__link">Features</a>
+                            </li>
+                            <li>
+                                <a href="#" class="footer__link">Blog</a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="footer__title">개발자</h3>
+                        <ul class="footer__links">
+                            <li>
+                                <a href="#" class="footer__link">Github</a>
+                            </li>
+                            <li>
+                                <a href="javascript:alert('준비중입니다.');" onfocus="this.blur()" class="footer__link">API</a>
+                            </li>
+                            <li>
+                                <a href="#" class="footer__link"></a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="footer__title">서포트</h3>
+                        <ul class="footer__links">
+                            <li>
+                                <a href="" class="footer__link">FAQs</a>
+                            </li>
+                            <li>
+                                <a href="Contact Us" class="footer__link"></a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="footer__title">팔로우</h3>
+                        <ul class="footer__social">
+                            <a href="#" target="_blank" class="footer__social-link">
+                                <i class="bx bxl-discord-alt"></i>
+                            </a>
+                            <a href="#" target="_blank" class="footer__social-link">
+                                <i class="bx bxl-instagram-alt"></i>
+                            </a>
+                            <a href="#" target="_blank" class="footer__social-link">
+                                <i class="bx bxl-github"></i>
+                            </a>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="footer__info container">
+                <span class="footer_copy">
+                    &#169; SOLIDRAW. All rights reserved.
+                </span>
+                <div class="footer__privacy">
+                    <a href="#">이용약관</a>
+                    <a href="#">개인정보처리방침</a>
+                </div>
+            </div>
+        </footer>
+        <!--========== SCROLL UP ==========-->
+        <a href="#" class="scrollup" id="scroll-up">
+            <i class="bx bx-chevrons-up"></i>
+        </a>
+        <!--================= JS ==================-->
+        <script src="{{url_for('static', filename='js/scrollreveal.min.js')}} "></script>
+        <script src="{{url_for('static', filename='js/swiper-bundle.min.js')}}"></script>
+        <script src="{{url_for('static', filename='js/main.js')}}"></script>
+        <script src="{{url_for('static', filename='js/drop_img.js')}}"></script>
+        <style>
+    </body>
 </html>
