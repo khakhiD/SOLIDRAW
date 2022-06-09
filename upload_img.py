@@ -9,7 +9,7 @@ app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
 #input 데이터의 확장자 조건
 app.config['UPLOAD_EXTENSIONS'] = ['.jpg', '.png', '.gif']
 #이미지가 저장될 경로
-app.config['UPLOAD_PATH'] = 'static/img/'
+app.config['UPLOAD_PATH'] = 'solidraw/static/img/'
 
 
 def validate_image(stream):
@@ -32,7 +32,7 @@ def index():
     files = os.listdir(app.config['UPLOAD_PATH'])
     #파일 업로드 동작(드롭다운 등)은 static의 js 파일에 정의되어 있음
     #전체 사이트 껍데기 index.html에 있음
-    return render_template('index.html', files=files)
+    return render_template('index2.html', files=files)
 
 #파일 업로드 동작
 @app.route('/', methods=['POST'])

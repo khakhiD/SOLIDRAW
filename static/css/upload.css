@@ -1,0 +1,16 @@
+.image-show {
+    z-index: -1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    height: auto;
+}
+
+#upload__button {
+    text-align: center;
+}
+
+#chooseFile {
+    display: none;
+}
