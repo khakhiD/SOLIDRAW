@@ -17,10 +17,16 @@ SOLIDRAW (솔리드로우)
 
 ## 프로젝트 소개
 
-<div align="left">
+<div align="center">
     <image src="static/img/docs/docs-io.png" style="width: 400px;">
+    <p>2022 LINC 3.0 동의대학교 통합 경진대회을 위해 디자인한 리플렛입니다.</p>
+    <image src="static/img/docs/leaflet-front.png" alt="리플렛-앞면">
+    <image src="static/img/docs/leaflet-back.png" alt="리플렛-뒷면">
 </div>
 
+<br />
+
+### 요약
 - 손으로 스케치한 건축 평면도를 <strong>SOLID</strong>한 평면도로 변환
 - 손 스케치 도면 이미지 파일을 웹앱에 입력
 - 보정된 평면도 이미지를 출력
@@ -69,5 +75,10 @@ SOLIDRAW (솔리드로우)
         ScrollReveal.js &nbsp;&nbsp; swiper.js &nbsp;&nbsp; Kakao OCR API
     </td>
 </table>
+
+
+## 🌿 리플렛
+
+
 
 <br />
