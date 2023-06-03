@@ -43,8 +43,7 @@ SOLIDRAW (솔리드로우)
 |[손다연](https://github.com/dyson1357)|[김도영](https://github.com/kkamag)|[신동호](https://github.com/khakhid)|
 |---|---|---|
 | <div align="center"><img height="100px" src="https://avatars.githubusercontent.com/dyson1357" alt="손다연"/></div> | <div align="center"><img height="100px" src="https://avatars.githubusercontent.com/kkamag" alt="김도영" /></div> | <div align="center"><img height="100px" src="https://avatars.githubusercontent.com/khakhid" alt="신동호" /></div> |
-| <strong>팀장 / 백엔드</strong> <br />-Flask 웹 서버 구축 | <strong>백엔드</strong> <br />- 카카오 OCR 활용<br /> - 도면 변환 로직 구현| <strong>프론트엔드</strong> <br />- 웹 디자인 및 구축   |
-|  |  |  |
+| <strong>백엔드</strong> <br />- 팀장<br />- Flask 서버 구축<br />- 도면 변환 로직 구현 | <strong>백엔드</strong> <br />- Flask 서버 구축<br /> - 도면 변환 로직 구현| <strong>프론트엔드</strong> <br />- 웹 디자인<br />- 전체 페이지 개발<br />- 리플렛 제작  |
 
 <br />
 
@@ -77,7 +76,7 @@ SOLIDRAW (솔리드로우)
 <tr>
     <td align="center">기타</td>
     <td>
-        ScrollReveal.js &nbsp;&nbsp; swiper.js &nbsp;&nbsp; Kakao OCR API
+        <a href="https://scrollrevealjs.org/" target="_blank">ScrollReveal</a> &nbsp;&nbsp; <a href="https://swiperjs.com/" target="_blank">Swiper</a> &nbsp;&nbsp; <a href="https://www.kakaoicloud.com/service/detail/6-9" target="_blank">Kakao OCR</a>
     </td>
 </table>
 
